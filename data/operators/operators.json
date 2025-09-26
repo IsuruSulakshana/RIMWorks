@@ -1,0 +1,31 @@
+[
+    {
+        "name": "Ruchee",
+        "username": "Ruchee@123",
+        "password": "12345678"
+    },
+    {
+        "name": "Kavish",
+        "username": "Kavish@1234",
+        "password": "12345678",
+        "role": "Supervisor"
+    },
+    {
+        "name": "Tharindu",
+        "username": "Tharindu@123",
+        "password": "12345678",
+        "role": "Operator"
+    },
+    {
+        "name": "Nadun",
+        "username": "Nadun@1234",
+        "password": "12345678",
+        "role": "Supervisor"
+    },
+    {
+        "name": "Amith",
+        "username": "Amith@123",
+        "password": "12345678",
+        "role": "Operator"
+    }
+]

@@ -1,0 +1,10 @@
+{
+    "vehicle": "GMC Yukon Gen 04",
+    "system": "Steering",
+    "mold_name": "GMC Yukon Gen 04_Steering",
+    "mold_type": "Soft Silicon",
+    "mold_number": "M001",
+    "life_span": 6,
+    "part_number": "12345678",
+    "creation_type": "Previous mold life complete"
+}
