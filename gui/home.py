@@ -7,13 +7,15 @@ from gui.widgets.create_operator_screen import CreateOperatorScreen
 from gui.widgets.create_mold_screen import CreateMoldScreen
 from gui.widgets.operator_login_screen import OperatorLoginScreen
 from gui.widgets.engineer_login_screen import EngineerLoginScreen
+from gui.widgets.calibration_machine_screen import CalibrationMachineScreen  # New import
+from gui.widgets.view_mold_screen import ViewMoldScreen  # New import
 
 class HomeScreen(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("RIMWorks")
-        self.setGeometry(400, 200, 600, 700)
-        self.setMinimumSize(500, 600)
+        self.setGeometry(400, 200, 600, 600)
+        self.setMinimumSize(500, 400)
 
         # Stack to manage screens
         self.stack = QStackedWidget()
@@ -29,12 +31,15 @@ class HomeScreen(QWidget):
         self.operator_dashboard = OperatorDashboard()
         self.create_operator_screen = CreateOperatorScreen()
         self.create_mold_screen = CreateMoldScreen()
+        self.calibration_machine_screen = CalibrationMachineScreen()  # New screen
+        self.view_mold_screen = ViewMoldScreen(on_back=lambda: self.switch_screen("engineer_dashboard"))  # New screen
 
         # Add screens to stack
         for screen in [
             self.home_ui, self.engineer_login_screen, self.operator_login_screen,
             self.engineer_dashboard, self.operator_dashboard,
-            self.create_operator_screen, self.create_mold_screen
+            self.create_operator_screen, self.create_mold_screen,
+            self.calibration_machine_screen, self.view_mold_screen
         ]:
             self.stack.addWidget(screen)
 
@@ -55,6 +60,12 @@ class HomeScreen(QWidget):
         self.engineer_dashboard.create_mold_btn.clicked.connect(
             lambda: self.switch_screen("create_mold")
         )
+        self.engineer_dashboard.calibration_btn.clicked.connect(
+            lambda: self.switch_screen("calibration_machine")
+        )
+        self.engineer_dashboard.view_molds_btn.clicked.connect(
+            lambda: self.switch_screen("view_mold_screen")
+        )
         self.engineer_dashboard.back_btn.clicked.connect(lambda: self.switch_screen("home"))
 
         # --- Operator Dashboard navigation ---
@@ -70,6 +81,11 @@ class HomeScreen(QWidget):
             lambda: self.switch_screen("engineer_dashboard")
         )
 
+        # --- Calibration Machine navigation ---
+        self.calibration_machine_screen.back_btn.clicked.connect(
+            lambda: self.switch_screen("engineer_dashboard")
+        )
+
     # ------------------- Screen switching -------------------
     def switch_screen(self, screen_name):
         mapping = {
@@ -79,7 +95,9 @@ class HomeScreen(QWidget):
             "engineer_dashboard": self.engineer_dashboard,
             "operator_dashboard": self.operator_dashboard,
             "create_operator": self.create_operator_screen,
-            "create_mold": self.create_mold_screen
+            "create_mold": self.create_mold_screen,
+            "calibration_machine": self.calibration_machine_screen,
+            "view_mold_screen": self.view_mold_screen
         }
         if screen_name in mapping:
             self.stack.setCurrentWidget(mapping[screen_name])

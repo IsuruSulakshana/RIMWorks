@@ -1,3 +1,4 @@
+# gui/engineer_dashboard.py
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QSizePolicy, QFrame
 from PyQt6.QtCore import Qt
 
@@ -51,10 +52,11 @@ class EngineerDashboard(QWidget):
         self.create_job_btn = QPushButton("📋 Create Job")
         self.view_molds_btn = QPushButton("🔍 View Mold Details")
         self.job_status_btn = QPushButton("📊 Job Status")
+        self.calibration_btn = QPushButton("⚙️ Calibration Machine")  # New button
         self.back_btn = QPushButton("⬅️ Back to Home")
 
         for btn in [self.create_operator_btn, self.create_mold_btn, self.create_job_btn,
-                    self.view_molds_btn, self.job_status_btn, self.back_btn]:
+                    self.view_molds_btn, self.job_status_btn, self.calibration_btn, self.back_btn]:
             btn.setStyleSheet(button_style)
             btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
             layout.addWidget(btn, alignment=Qt.AlignmentFlag.AlignHCenter)

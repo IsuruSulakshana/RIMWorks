@@ -1,10 +1,1 @@
-{
-    "vehicle": "ABCD",
-    "system": "Steering",
-    "mold_name": "ABCD_Steering",
-    "mold_type": "Hard Silicon",
-    "mold_number": "M001",
-    "life_span": 16,
-    "part_number": "12345678",
-    "creation_type": "New part"
-}
+null

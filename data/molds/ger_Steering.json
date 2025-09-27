@@ -1,0 +1,10 @@
+{
+    "vehicle": "ger",
+    "system": "Steering",
+    "mold_name": "ger_Steering",
+    "mold_type": "Soft Silicon",
+    "mold_number": "reg",
+    "life_span": 1,
+    "part_number": "ewrgteh",
+    "creation_type": "Previous mold life complete"
+}

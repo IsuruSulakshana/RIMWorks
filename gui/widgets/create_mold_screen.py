@@ -4,8 +4,7 @@ from PyQt6.QtWidgets import (
     QSpinBox, QPushButton, QMessageBox
 )
 from PyQt6.QtCore import Qt
-import json
-import os
+import json, os, datetime
 
 class CreateMoldScreen(QWidget):
     SYSTEMS = ["Steering", "Braking", "Suspension", "Other"]
@@ -79,6 +78,23 @@ class CreateMoldScreen(QWidget):
         part_layout.addWidget(self.part_input)
         layout.addLayout(part_layout)
 
+        # --- Mixing Ratio ---
+        mixing_layout = QHBoxLayout()
+        self.mixing_ratio_input = QComboBox()
+        # temp values until calibration machine integration
+        self.mixing_ratio_input.addItems(["A","B","C","D","E","F","G","H","I","J"])
+        mixing_layout.addWidget(QLabel("Mixing Ratio:"))
+        mixing_layout.addWidget(self.mixing_ratio_input)
+        layout.addLayout(mixing_layout)
+
+        # --- Chemical Type ---
+        chemical_layout = QHBoxLayout()
+        self.chemical_type_input = QComboBox()
+        self.chemical_type_input.addItems(["A", "B", "C", "D"])
+        chemical_layout.addWidget(QLabel("Chemical Type:"))
+        chemical_layout.addWidget(self.chemical_type_input)
+        layout.addLayout(chemical_layout)
+
         # --- Creation Type ---
         creation_layout = QHBoxLayout()
         self.creation_type_input = QComboBox()
@@ -92,7 +108,7 @@ class CreateMoldScreen(QWidget):
         save_btn = QPushButton("💾 Save Mold")
         save_btn.clicked.connect(self.save_mold)
 
-        # BACK BUTTON: now properly accessible
+        # BACK BUTTON
         self.back_btn = QPushButton("🔙 Back")
         self.back_btn.clicked.connect(self.on_back if self.on_back else lambda: None)
 
@@ -101,8 +117,6 @@ class CreateMoldScreen(QWidget):
         layout.addLayout(button_layout)
 
         self.setLayout(layout)
-
-        # Auto-update mold name initially
         self.vehicle_input.textChanged.connect(self.update_mold_name)
 
     def update_mold_name(self):
@@ -120,10 +134,16 @@ class CreateMoldScreen(QWidget):
         life_span = self.life_input.value()
         part_number = self.part_input.text().strip()
         creation_type = self.creation_type_input.currentText().strip()
+        mixing_ratio = self.mixing_ratio_input.currentText()
+        chemical_type = self.chemical_type_input.currentText()
 
         if not all([vehicle, system, mold_name, mold_type, mold_number, part_number]):
             QMessageBox.warning(self, "Missing Info", "Please fill all mandatory fields.")
             return
+
+        # Save with timestamp
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_name = f"{mold_name}_{timestamp}.json"
 
         data = {
             "vehicle": vehicle,
@@ -133,11 +153,14 @@ class CreateMoldScreen(QWidget):
             "mold_number": mold_number,
             "life_span": life_span,
             "part_number": part_number,
-            "creation_type": creation_type
+            "creation_type": creation_type,
+            "mixing_ratio": mixing_ratio,
+            "chemical_type": chemical_type,
+            "timestamp": timestamp
         }
 
         try:
-            file_path = os.path.join(self.data_folder, f"{mold_name}.json")
+            file_path = os.path.join(self.data_folder, file_name)
             with open(file_path, "w") as f:
                 json.dump(data, f, indent=4)
             QMessageBox.information(self, "Success", f"Mold saved:\n{file_path}")

@@ -1,0 +1,13 @@
+{
+    "vehicle": "Ford",
+    "system": "Suspension",
+    "mold_name": "Ford_Suspension",
+    "mold_type": "Soft Silicon",
+    "mold_number": "1234M",
+    "life_span": 16,
+    "part_number": "12345678",
+    "creation_type": "New part",
+    "mixing_ratio": "C",
+    "chemical_type": "A",
+    "timestamp": "20250926_150744"
+}
