@@ -7,8 +7,10 @@ from gui.widgets.create_operator_screen import CreateOperatorScreen
 from gui.widgets.create_mold_screen import CreateMoldScreen
 from gui.widgets.operator_login_screen import OperatorLoginScreen
 from gui.widgets.engineer_login_screen import EngineerLoginScreen
-from gui.widgets.calibration_machine_screen import CalibrationMachineScreen  # New import
-from gui.widgets.view_mold_screen import ViewMoldScreen  # New import
+from gui.widgets.calibration_machine_screen import CalibrationMachineScreen
+from gui.widgets.view_mold_screen import ViewMoldScreen
+from gui.widgets.create_job_screen import CreateJobScreen
+from gui.widgets.select_mold_screen import SelectMoldScreen  # Added
 
 class HomeScreen(QWidget):
     def __init__(self):
@@ -31,15 +33,22 @@ class HomeScreen(QWidget):
         self.operator_dashboard = OperatorDashboard()
         self.create_operator_screen = CreateOperatorScreen()
         self.create_mold_screen = CreateMoldScreen()
-        self.calibration_machine_screen = CalibrationMachineScreen()  # New screen
-        self.view_mold_screen = ViewMoldScreen(on_back=lambda: self.switch_screen("engineer_dashboard"))  # New screen
+        self.calibration_machine_screen = CalibrationMachineScreen()
+        self.view_mold_screen = ViewMoldScreen(on_back=lambda: self.switch_screen("engineer_dashboard"))
+
+        # CreateJobScreen with proper on_next callback
+        self.create_job_screen = CreateJobScreen(
+            on_back=lambda: self.switch_screen("engineer_dashboard"),
+            on_next=self.goto_select_mold
+        )
 
         # Add screens to stack
         for screen in [
             self.home_ui, self.engineer_login_screen, self.operator_login_screen,
             self.engineer_dashboard, self.operator_dashboard,
             self.create_operator_screen, self.create_mold_screen,
-            self.calibration_machine_screen, self.view_mold_screen
+            self.calibration_machine_screen, self.view_mold_screen,
+            self.create_job_screen
         ]:
             self.stack.addWidget(screen)
 
@@ -59,6 +68,9 @@ class HomeScreen(QWidget):
         )
         self.engineer_dashboard.create_mold_btn.clicked.connect(
             lambda: self.switch_screen("create_mold")
+        )
+        self.engineer_dashboard.create_job_btn.clicked.connect(
+            lambda: self.switch_screen("create_job")
         )
         self.engineer_dashboard.calibration_btn.clicked.connect(
             lambda: self.switch_screen("calibration_machine")
@@ -86,6 +98,8 @@ class HomeScreen(QWidget):
             lambda: self.switch_screen("engineer_dashboard")
         )
 
+        # --- Create Job navigation handled by on_next callback ---
+
     # ------------------- Screen switching -------------------
     def switch_screen(self, screen_name):
         mapping = {
@@ -97,7 +111,8 @@ class HomeScreen(QWidget):
             "create_operator": self.create_operator_screen,
             "create_mold": self.create_mold_screen,
             "calibration_machine": self.calibration_machine_screen,
-            "view_mold_screen": self.view_mold_screen
+            "view_mold_screen": self.view_mold_screen,
+            "create_job": self.create_job_screen
         }
         if screen_name in mapping:
             self.stack.setCurrentWidget(mapping[screen_name])
@@ -116,3 +131,20 @@ class HomeScreen(QWidget):
         if self.operator_login_screen.validate_login():
             print("Operator login successful!")
             self.switch_screen("operator_dashboard")
+
+    # ------------------- Create Job → Select Mold flow -------------------
+    def goto_select_mold(self, current_job):
+        """Callback after operator assigned: open SelectMoldScreen."""
+        select_screen = SelectMoldScreen(
+            current_job=current_job,
+            on_back=lambda: self.switch_screen("create_job"),
+            on_next=self.job_started
+        )
+        self.stack.addWidget(select_screen)
+        self.stack.setCurrentWidget(select_screen)
+
+    def job_started(self, job_data):
+        """Callback after Start Job pressed in SelectMoldScreen."""
+        print("Job started:", job_data)
+        # You can add code to save job to JSON or database here
+        self.switch_screen("engineer_dashboard")

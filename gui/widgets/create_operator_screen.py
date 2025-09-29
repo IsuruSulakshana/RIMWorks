@@ -47,10 +47,24 @@ class CreateOperatorScreen(QWidget):
         password_layout.addWidget(self.password_input)
         layout.addLayout(password_layout)
 
+        # --- EPF Number ---
+        epf_layout = QHBoxLayout()
+        self.epf_input = QLineEdit()
+        self.epf_input.setPlaceholderText("EPF Number")
+        epf_layout.addWidget(QLabel("EPF Number:"))
+        epf_layout.addWidget(self.epf_input)
+        layout.addLayout(epf_layout)
+
         # --- Role ---
         role_layout = QHBoxLayout()
         self.role_select = QComboBox()
-        self.role_select.addItems(["Operator", "Supervisor"])
+        self.role_select.addItems([
+            "Operator",
+            "Supervisor",
+            "Technician",
+            "Quality Controller",
+            "Executive"
+        ])
         role_layout.addWidget(QLabel("Role:"))
         role_layout.addWidget(self.role_select)
         layout.addLayout(role_layout)
@@ -75,10 +89,11 @@ class CreateOperatorScreen(QWidget):
         name = self.name_input.text().strip()
         username = self.username_input.text().strip()
         password = self.password_input.text().strip()
+        epf_number = self.epf_input.text().strip()
         role = self.role_select.currentText()
 
-        if not name or not username or not password:
-            QMessageBox.warning(self, "Missing Info", "Please fill all fields.")
+        if not name or not username or not password or not epf_number:
+            QMessageBox.warning(self, "Missing Info", "Please fill all fields including EPF Number.")
             return
 
         data = []
@@ -86,7 +101,13 @@ class CreateOperatorScreen(QWidget):
             with open(self.data_file, "r") as f:
                 data = json.load(f)
 
-        data.append({"name": name, "username": username, "password": password, "role": role})
+        data.append({
+            "name": name,
+            "username": username,
+            "password": password,
+            "epf_number": epf_number,
+            "role": role
+        })
 
         with open(self.data_file, "w") as f:
             json.dump(data, f, indent=4)
@@ -97,3 +118,4 @@ class CreateOperatorScreen(QWidget):
         self.name_input.clear()
         self.username_input.clear()
         self.password_input.clear()
+        self.epf_input.clear()
