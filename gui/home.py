@@ -10,7 +10,11 @@ from gui.widgets.engineer_login_screen import EngineerLoginScreen
 from gui.widgets.calibration_machine_screen import CalibrationMachineScreen
 from gui.widgets.view_mold_screen import ViewMoldScreen
 from gui.widgets.create_job_screen import CreateJobScreen
-from gui.widgets.select_mold_screen import SelectMoldScreen  # Added
+from gui.widgets.select_mold_screen import SelectMoldScreen
+from gui.widgets.job_status_screen import JobStatusScreen  # NEW
+
+import os, json, uuid
+from PyQt6.QtCore import Qt, QDateTime
 
 class HomeScreen(QWidget):
     def __init__(self):
@@ -36,19 +40,20 @@ class HomeScreen(QWidget):
         self.calibration_machine_screen = CalibrationMachineScreen()
         self.view_mold_screen = ViewMoldScreen(on_back=lambda: self.switch_screen("engineer_dashboard"))
 
-        # CreateJobScreen with proper on_next callback
         self.create_job_screen = CreateJobScreen(
             on_back=lambda: self.switch_screen("engineer_dashboard"),
             on_next=self.goto_select_mold
         )
 
-        # Add screens to stack
+        self.job_status_screen = JobStatusScreen(on_back=lambda: self.switch_screen("engineer_dashboard"))
+
+        # Add base screens to stack
         for screen in [
             self.home_ui, self.engineer_login_screen, self.operator_login_screen,
             self.engineer_dashboard, self.operator_dashboard,
             self.create_operator_screen, self.create_mold_screen,
             self.calibration_machine_screen, self.view_mold_screen,
-            self.create_job_screen
+            self.create_job_screen, self.job_status_screen
         ]:
             self.stack.addWidget(screen)
 
@@ -78,6 +83,9 @@ class HomeScreen(QWidget):
         self.engineer_dashboard.view_molds_btn.clicked.connect(
             lambda: self.switch_screen("view_mold_screen")
         )
+        self.engineer_dashboard.job_status_btn.clicked.connect(  # add button in EngineerDashboard UI
+            lambda: self.switch_screen("job_status")
+        )
         self.engineer_dashboard.back_btn.clicked.connect(lambda: self.switch_screen("home"))
 
         # --- Operator Dashboard navigation ---
@@ -98,8 +106,6 @@ class HomeScreen(QWidget):
             lambda: self.switch_screen("engineer_dashboard")
         )
 
-        # --- Create Job navigation handled by on_next callback ---
-
     # ------------------- Screen switching -------------------
     def switch_screen(self, screen_name):
         mapping = {
@@ -112,10 +118,14 @@ class HomeScreen(QWidget):
             "create_mold": self.create_mold_screen,
             "calibration_machine": self.calibration_machine_screen,
             "view_mold_screen": self.view_mold_screen,
-            "create_job": self.create_job_screen
+            "create_job": self.create_job_screen,
+            "job_status": self.job_status_screen
         }
         if screen_name in mapping:
             self.stack.setCurrentWidget(mapping[screen_name])
+            # auto-refresh job status
+            if screen_name == "job_status":
+                self.job_status_screen.load_jobs()
 
     # ------------------- Login handlers -------------------
     def engineer_login(self):
@@ -135,16 +145,29 @@ class HomeScreen(QWidget):
     # ------------------- Create Job → Select Mold flow -------------------
     def goto_select_mold(self, current_job):
         """Callback after operator assigned: open SelectMoldScreen."""
-        select_screen = SelectMoldScreen(
+        self.select_screen = SelectMoldScreen(
             current_job=current_job,
             on_back=lambda: self.switch_screen("create_job"),
             on_next=self.job_started
         )
-        self.stack.addWidget(select_screen)
-        self.stack.setCurrentWidget(select_screen)
+        self.stack.addWidget(self.select_screen)
+        self.stack.setCurrentWidget(self.select_screen)
 
     def job_started(self, job_data):
         """Callback after Start Job pressed in SelectMoldScreen."""
         print("Job started:", job_data)
-        # You can add code to save job to JSON or database here
-        self.switch_screen("engineer_dashboard")
+
+        # Ensure jobs folder exists
+        os.makedirs("data/jobs", exist_ok=True)
+
+        # Assign unique job_id if missing
+        if "job_id" not in job_data:
+            job_data["job_id"] = f"JOB-{uuid.uuid4().hex[:6].upper()}"
+
+        # Save job JSON
+        job_file = os.path.join("data/jobs", f"{job_data['job_id']}.json")
+        with open(job_file, "w") as f:
+            json.dump(job_data, f, indent=4)
+
+        # Navigate to Job Status screen
+        self.switch_screen("job_status")

@@ -1,0 +1,13 @@
+{
+    "vehicle": "Dodge Challenger",
+    "system": "Steering",
+    "mold_name": "Dodge Challenger_Steering",
+    "mold_type": "Soft Silicon",
+    "mold_number": "1234",
+    "life_span": 8,
+    "part_number": "12345678910",
+    "creation_type": "Previous mold life complete",
+    "mixing_ratio": "A",
+    "chemical_type": "B",
+    "timestamp": "20250930_170105"
+}

@@ -6,7 +6,7 @@ class EngineerDashboard(QWidget):
     def __init__(self, parent=None, callbacks=None):
         """
         callbacks: optional dict to assign functions to buttons
-        Example: {"create_operator": func, "create_job": func, ...}
+        Example: {"create_operator": func, "create_job": func, "job_status": func, ...}
         """
         super().__init__(parent)
         self.callbacks = callbacks or {}
@@ -17,7 +17,7 @@ class EngineerDashboard(QWidget):
         layout.setSpacing(18)
         layout.setContentsMargins(40, 20, 40, 20)
 
-        # Title
+        # --- Title ---
         title_label = QLabel("Engineer Dashboard")
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label.setStyleSheet("""
@@ -28,7 +28,7 @@ class EngineerDashboard(QWidget):
         """)
         layout.addWidget(title_label)
 
-        # Button style
+        # --- Button style ---
         button_style = """
             QPushButton {
                 font-size: 16px;
@@ -45,7 +45,7 @@ class EngineerDashboard(QWidget):
             }
         """
 
-        # Buttons
+        # --- Buttons ---
         self.create_operator_btn = QPushButton("👤 Create Operator")
         self.create_mold_btn = QPushButton("🛠️ Create Mold")
         self.create_job_btn = QPushButton("📋 Create Job")
@@ -69,7 +69,7 @@ class EngineerDashboard(QWidget):
             btn.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
             layout.addWidget(btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-        # Connect buttons to callbacks if provided
+        # --- Connect buttons to external callbacks if provided ---
         btn_map = {
             "create_operator": self.create_operator_btn,
             "create_mold": self.create_mold_btn,

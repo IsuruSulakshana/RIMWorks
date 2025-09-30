@@ -1,0 +1,23 @@
+{
+    "job_id": "JOB-A14DC6",
+    "operator": {
+        "username": "Kavish@1234",
+        "name": "Kavish",
+        "epf_number": null,
+        "role": "Supervisor"
+    },
+    "mold": {
+        "vehicle": "ger",
+        "system": "Steering",
+        "mold_name": "ger_Steering",
+        "mold_type": "Soft Silicon",
+        "mold_number": "reg",
+        "life_span": 1,
+        "part_number": "ewrgteh",
+        "creation_type": "Previous mold life complete"
+    },
+    "part_count": 3,
+    "start_datetime": "2025-09-30T17:15:52",
+    "end_datetime": "2025-10-01T17:15:52",
+    "status": "Not Started"
+}

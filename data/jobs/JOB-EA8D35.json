@@ -1,0 +1,26 @@
+{
+    "job_id": "JOB-EA8D35",
+    "operator": {
+        "username": "Kavish@1234",
+        "name": "Kavish",
+        "epf_number": null,
+        "role": "Supervisor"
+    },
+    "mold": {
+        "vehicle": "Ford",
+        "system": "Suspension",
+        "mold_name": "Ford_Suspension",
+        "mold_type": "Soft Silicon",
+        "mold_number": "1234M",
+        "life_span": 16,
+        "part_number": "12345678",
+        "creation_type": "New part",
+        "mixing_ratio": "C",
+        "chemical_type": "A",
+        "timestamp": "20250926_150744"
+    },
+    "part_count": 12,
+    "start_datetime": "2025-09-30T16:59:01",
+    "end_datetime": "2025-10-04T16:59:01",
+    "status": "Not Started"
+}

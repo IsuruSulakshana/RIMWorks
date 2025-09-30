@@ -1,16 +1,16 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QComboBox, QLineEdit,
-    QListWidget, QPushButton, QMessageBox, QFrame, QScrollArea
+    QListWidget, QPushButton, QMessageBox, QFrame
 )
 from PyQt6.QtCore import Qt
 import json
 import os
-from datetime import date, datetime
 
 class ViewMoldScreen(QWidget):
-    def __init__(self, on_back=None):
+    def __init__(self, on_back=None, on_select=None):
         super().__init__()
-        self.on_back = on_back
+        self.on_back = on_back            # callback for back button
+        self.on_select = on_select        # callback for selecting a mold
         self.data_folder = "data/molds"
         os.makedirs(self.data_folder, exist_ok=True)
         self.mold_files = []
@@ -79,7 +79,7 @@ class ViewMoldScreen(QWidget):
 
         # --- Mold List ---
         self.mold_list_widget = QListWidget()
-        self.mold_list_widget.setMaximumHeight(200)  # Reduced height
+        self.mold_list_widget.setMaximumHeight(200)
         self.mold_list_widget.itemSelectionChanged.connect(self.display_selected_mold)
         layout.addWidget(self.mold_list_widget)
 
@@ -93,9 +93,15 @@ class ViewMoldScreen(QWidget):
         button_layout = QHBoxLayout()
         self.delete_btn = QPushButton("🗑️ Delete")
         self.delete_btn.clicked.connect(self.delete_selected_mold)
+
+        self.select_btn = QPushButton("✅ Select This Mold")
+        self.select_btn.clicked.connect(self.select_current_mold)
+
         self.back_btn = QPushButton("⬅️ Back")
         self.back_btn.clicked.connect(self.on_back if self.on_back else lambda: None)
+
         button_layout.addWidget(self.delete_btn)
+        button_layout.addWidget(self.select_btn)
         button_layout.addWidget(self.back_btn)
         layout.addLayout(button_layout)
 
@@ -111,9 +117,10 @@ class ViewMoldScreen(QWidget):
             with open(path, "r") as f:
                 data = json.load(f)
                 vehicles.add(data.get("vehicle", ""))
-                date = data.get("created_at", "")
-                if date:
-                    dates.add(date)
+                date_created = data.get("created_at", "")
+                if date_created:
+                    dates.add(date_created)
+
         # Update dropdowns
         self.vehicle_filter.clear()
         self.vehicle_filter.addItem("All Vehicles")
@@ -133,6 +140,7 @@ class ViewMoldScreen(QWidget):
             path = os.path.join(self.data_folder, file)
             with open(path, "r") as f:
                 data = json.load(f)
+
             # Apply filters
             if self.vehicle_filter.currentText() != "All Vehicles" and data.get("vehicle") != self.vehicle_filter.currentText():
                 continue
@@ -148,6 +156,7 @@ class ViewMoldScreen(QWidget):
                 continue
             if self.search_input.text().strip() and self.search_input.text().strip().lower() not in data.get("part_number", "").lower():
                 continue
+
             self.mold_list_widget.addItem(data.get("mold_name"))
 
     # ------------------ Display Selected Mold ------------------
@@ -201,5 +210,12 @@ class ViewMoldScreen(QWidget):
                 if widget:
                     widget.setParent(None)
             QMessageBox.information(self, "Deleted", "Mold deleted successfully.")
-            with open(file_path, "w") as f:
-                json.dump(self.selected_mold_data, f, indent=4)
+
+    # ------------------ Select Mold ------------------
+    def select_current_mold(self):
+        if not self.selected_mold_data:
+            QMessageBox.warning(self, "No selection", "Please select a mold first.")
+            return
+        if self.on_select:
+            self.on_select(self.selected_mold_data)
+        self.hide()
